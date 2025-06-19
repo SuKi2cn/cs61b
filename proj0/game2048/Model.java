@@ -113,7 +113,37 @@ public class Model extends Observable {
         // TODO: Modify this.board (and perhaps this.score) to account
         // for the tilt to the Side SIDE. If the board changed, set the
         // changed local variable to true.
-
+        this.board.startViewingFrom(side);
+        for (int col = 0; col < this.board.size(); col++) {
+            int next = this.board.size()-1;
+            for (int row = this.board.size()-2; row >= 0 ; row--){
+                if(this.board.tile(col,row)!=null){
+                    Tile t = this.board.tile(col,row);
+                    if(next <= row){}
+                    else if(this.board.tile(col,next)==null){
+                        this.board.move(col,next,t);
+                        changed = true;
+                    }
+                    else if(this.board.tile(col,next).value()==t.value()){
+                        this.board.move(col,next,t);
+                        this.score += 2*t.value();
+                        changed = true;
+                        next--;
+                        while(this.board.tile(col,next)!=null && next > 0){
+                            next--;
+                        }
+                    }
+                    else{
+                        next--;
+                        if (next != row) {
+                            this.board.move(col, next, t);
+                            changed = true;
+                        }
+                    }
+                }
+            }
+        }
+        this.board.startViewingFrom(Side.NORTH);
         checkGameOver();
         if (changed) {
             setChanged();
@@ -175,7 +205,21 @@ public class Model extends Observable {
      */
     public static boolean atLeastOneMoveExists(Board b) {
         // TODO: Fill in this function.
-        
+        if(emptySpaceExists(b)) {return true;}
+        else{
+            int size = b.size();
+            for(int i=0;i<size;i++){
+                for(int j=0;j<size;j++){
+                    int v = b.tile(i,j).value();
+                    if(i+1 < size){
+                        if(v==b.tile(i+1,j).value()) return true;
+                    }
+                    if(j+1 < size){
+                        if(v==b.tile(i, j+1).value()) return true;
+                    }
+                }
+            }
+        }
         return false;
     }
 
